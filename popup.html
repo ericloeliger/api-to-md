@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { width: 350px; font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; box-sizing: border-box; }
+    h3 { margin-top: 0; font-size: 14px; color: #333; }
+    .controls { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+    .settings-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-size: 11px; color: #444; align-items: center; }
+    .settings-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    button { padding: 6px 10px; font-size: 12px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; }
+    button:hover { background: #eee; }
+    button.primary { background: #0066cc; color: #fff; border-color: #0055b3; }
+    button.primary:hover { background: #0055b3; }
+    button.danger { background: #cc0000; color: #fff; border-color: #b30000; }
+    button.danger:hover { background: #b30000; }
+    #warning { margin-bottom: 8px; padding: 6px 8px; font-size: 11px; color: #7a4b00; background: #fff4d6; border: 1px solid #f0c36d; border-radius: 4px; }
+    #log { height: 210px; background: #fff; border: 1px solid #ddd; border-radius: 4px; overflow-y: auto; padding: 8px; font-size: 11px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h3>API Request Capture</h3>
+  <div class="controls">
+    <button id="toggleBtn" class="primary">Start Capturing</button>
+    <button id="clearBtn">Clear</button>
+    <button id="copyAllBtn">Copy All (MD)</button>
+    <button id="downloadBtn">Download .md</button>
+  </div>
+  <div class="settings-group">
+    <label><input type="checkbox" id="excludeMixpanel" checked> Exclude Mixpanel</label>
+    <label><input type="checkbox" id="excludeChurnZero" checked> Exclude ChurnZero</label>
+    <label><input type="checkbox" id="excludeDatadog" checked> Exclude Datadog</label>
+    <label><input type="checkbox" id="includeHeaders" checked> Include Headers</label>
+  </div>
+  <div id="warning" hidden>Session storage is full: some captures won't survive a service worker restart. Export them now, or clear.</div>
+  <div id="log">Click "Start Capturing" and use the website...</div>
+  <script src="settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
