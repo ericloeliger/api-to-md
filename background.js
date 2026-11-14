@@ -51,7 +51,11 @@ function flushRequests() {
   }
   dirtyIds.clear();
 
-  if (toRemove.length) chrome.storage.session.remove(toRemove);
+  if (toRemove.length) {
+    chrome.storage.session.remove(toRemove).catch((err) => {
+      console.warn("Could not remove cleared requests:", err);
+    });
+  }
   chrome.storage.session.set(toSet).catch((err) => {
     // Stays set until the requests are cleared; the popup shows a warning.
     storageFull = true;
@@ -61,7 +65,14 @@ function flushRequests() {
 
 function setActiveTabId(tabId) {
   activeTabId = tabId;
-  chrome.storage.session.set({ activeTabId });
+  chrome.storage.session.set({ activeTabId }).catch((err) => {
+    console.warn("Could not persist active tab:", err);
+  });
+}
+
+// Runs fn once saved state is restored, logging any error it throws.
+function whenReady(fn, label) {
+  ready.then(fn).catch((err) => console.error(`Failed to handle ${label}:`, err));
 }
 
 function sortedRequests() {
@@ -77,13 +88,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Listeners are registered at top level so events wake a stopped worker.
 chrome.debugger.onEvent.addListener((source, method, params) => {
-  ready.then(() => onDebuggerEvent(source, method, params));
+  whenReady(() => onDebuggerEvent(source, method, params), "debugger event");
 });
 
 chrome.debugger.onDetach.addListener((source) => {
-  ready.then(() => {
+  whenReady(() => {
     if (source.tabId === activeTabId) setActiveTabId(null);
-  });
+  }, "debugger detach");
 });
 
 function handleMessage(request, sendResponse) {
@@ -119,7 +130,9 @@ function handleMessage(request, sendResponse) {
   }
   else if (request.action === "updateSettings") {
     settings = { ...DEFAULT_SETTINGS, ...request.settings };
-    chrome.storage.local.set(settings);
+    chrome.storage.local.set(settings).catch((err) => {
+      console.warn("Could not save settings:", err);
+    });
     sendResponse({ success: true });
   }
   else {

@@ -94,9 +94,10 @@ function startPolling() {
 document.getElementById("copyAllBtn").addEventListener("click", () => {
   getFormattedMarkdown((markdown) => {
     if (!markdown) return alert("No requests captured yet!");
-    navigator.clipboard.writeText(markdown).then(() => {
-      alert("Copied all requests as Markdown to clipboard!");
-    });
+    navigator.clipboard
+      .writeText(markdown)
+      .then(() => alert("Copied all requests as Markdown to clipboard!"))
+      .catch((err) => alert("Failed to copy to clipboard: " + err));
   });
 });
 
@@ -182,7 +183,8 @@ function prettyPrintJson(text) {
   let inString = false;
   const newline = () => "\n" + "  ".repeat(depth);
 
-  for (let i = 0; i < text.length; i++) {
+  let i = 0;
+  while (i < text.length) {
     const c = text[i];
     if (inString) {
       out += c;
@@ -211,6 +213,7 @@ function prettyPrintJson(text) {
     else if (c === ",") out += "," + newline();
     else if (c === ":") out += ": ";
     else if (!/\s/.test(c)) out += c;
+    i++;
   }
   return out;
 }
